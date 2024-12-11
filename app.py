@@ -1,4 +1,5 @@
 import pickle
+import gzip
 import streamlit as st
 import requests
 
@@ -21,12 +22,17 @@ def recommend(movie):
         recommended_movie_posters.append(fetch_poster(movie_id))
         recommended_movie_names.append(movies.iloc[i[0]].title)
 
-    return recommended_movie_names,recommended_movie_posters
+    return recommended_movie_names, recommended_movie_posters
 
+# Load compressed files
+def load_compressed_pickle(file_path):
+    with gzip.open(file_path, 'rb') as f:
+        return pickle.load(f)
 
+# Streamlit UI
 st.header('Movie Recommender System')
-movies = pickle.load(open('model/movie_list.pkl','rb'))
-similarity = pickle.load(open('model/similarity.pkl','rb'))
+movies = load_compressed_pickle('model/movie_list.pkl.gz')
+similarity = load_compressed_pickle('model/similarity.pkl.gz')
 
 movie_list = movies['title'].values
 selected_movie = st.selectbox(
@@ -52,5 +58,3 @@ if st.button('Show Recommendation'):
     with col5:
         st.text(recommended_movie_names[4])
         st.image(recommended_movie_posters[4])
-
-
